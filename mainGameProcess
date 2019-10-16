@@ -1,2 +1,18 @@
-import random
+# Whackamole
+# By Calvin Probst calvin.probst@gmail.com
+# https://github.com/calvinProbstSchool/whackamoleProbst
+#
+
 import pygame
+import random
+import sys
+from pygame.locals import *
+from pygame.sprite import  *
+
+WINDOWSIZE = 600
+FPS = 30
+
+def main():
+    global FPSCLOCK, DISPLAYSURF, GAMEFONT
+    pygame.init()
+    DISPLAYSURF = pygame.display.set_mode((WINDOWSIZE, WINDOWSIZE))
