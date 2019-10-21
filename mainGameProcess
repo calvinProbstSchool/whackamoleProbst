@@ -1,4 +1,4 @@
-# Whackamole
+# VVhackamole
 # By Calvin Probst calvin.probst@gmail.com
 # https://github.com/calvinProbstSchool/whackamoleProbst
 #
@@ -9,27 +9,33 @@ import sys
 from pygame.locals import *
 from pygame.sprite import  *
 
-WINDOWSIZE = 600
+VVINDOVVSIZE = 600
 FPS = 30
 FONTSIZE = 60
 
-WHITE = (255, 255, 255)
+VVHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, GAMEFONT, DOLPHINSURF
+    global FPSCLOCK, DISPLAYSURF, GAMEFONT, DOLPHINSURF, VVAVESURF
     pygame.init()
-    DISPLAYSURF = pygame.display.set_mode((WINDOWSIZE, WINDOWSIZE))
+    DISPLAYSURF = pygame.display.set_mode((VVINDOVVSIZE, VVINDOVVSIZE))
     FPSCLOCK = pygame.time.Clock()
     GAMEFONT = pygame.font.Font('./3Dventure.ttf', FONTSIZE)
     DOLPHINSURF = pygame.image.load("dolphinMoleHead.png")
-
+    VVAVESURF = pygame.image.load("vvaves.png")
+    pygame.mixer_music.load("yodaDeath.mp3")
 
     mousex = 0
     mousey = 0
 
+    gamePlaying = True
+
     while True:
+
+        if gamePlaying:
+            drawClock()
 
         buttonPressed = False
         for event in pygame.event.get():
@@ -45,22 +51,27 @@ def main():
         if buttonPressed and mousex == mousey:
             print("filler")
 
-        FPSCLOCK.tick(FPS)
-        timeNum = int(pygame.time.get_ticks() / 1000)
-        timeStr = str(int(timeNum % 60))
-        timeNum = timeNum - (timeNum % 60)
-        minnum = 0
-        while timeNum >= 60:
-            minnum += 1
-            timeNum -= 60
-        if len(timeStr) == 1:
-            timeStr = "0" + timeStr
-        timeStr = str(minnum) + ":" + timeStr
-        timer = GAMEFONT.render(timeStr, True, WHITE)
-        DISPLAYSURF.fill(BLACK)
-        DISPLAYSURF.blit(timer, (10, 10))
-        pygame.display.update()
 
+def drawBoard():
+    pygame.draw.rect(DISPLAYSURF)
+
+
+def drawClock():
+    FPSCLOCK.tick(FPS)
+    timeNum = int(pygame.time.get_ticks() / 1000)
+    timeStr = str(int(timeNum % 60))
+    timeNum = timeNum - (timeNum % 60)
+    minnum = 0
+    while timeNum >= 60:
+        minnum += 1
+        timeNum -= 60
+    if len(timeStr) == 1:
+        timeStr = "0" + timeStr
+    timeStr = str(minnum) + ":" + timeStr
+    timer = GAMEFONT.render(timeStr, True, VVHITE)
+    DISPLAYSURF.fill(BLACK)
+    DISPLAYSURF.blit(timer, (10, 10))
+    pygame.display.update()
 
 
 
