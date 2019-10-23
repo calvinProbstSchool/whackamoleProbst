@@ -24,17 +24,29 @@ class VVaveRow(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
 
+class PlayButton(pygame.sprite.Sprite):
+    def __init__(self, x, y, textFont, message, textColor, bgColor):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = textFont.render(message,True, textColor, bgColor)
+
+        self.rect = self.image.get_rect()
+        self.rect.centerx, self.rect.y = x, centery
+
+
 VVINDOVVSIZE = 600
 FPS = 30
 FONTSIZE = 60
 
 VVHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+PURPBOI = (57,41,140)
+BLUEMANGROUP = (33, 195, 200)
 
 
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, GAMEFONT, ROW1, ROW2, ROW3, ROW4
+    global FPSCLOCK, DISPLAYSURF, GAMEFONT, ROVV1, ROVV2, ROVV3, ROVV4
     pygame.init()
     DISPLAYSURF = pygame.display.set_mode((VVINDOVVSIZE, VVINDOVVSIZE))
     FPSCLOCK = pygame.time.Clock()
@@ -44,16 +56,20 @@ def main():
     VVAVE2 = VVaveRow(100, 225)
     VVAVE3 = VVaveRow(100, 325)
     VVAVE4 = VVaveRow(100, 425)
+    STARTBUTTON = PlayButton(300, 50, GAMEFONT, "Play VVhackamole", BLUEMANGROUP, VVHITE)
     pygame.mixer_music.load("yodaDeath.mp3")
 
     mousex = 0
     mousey = 0
     timeGame = 0
-    ROW1 = Group(VVAVE1)
-    ROW2 = Group(VVAVE2)
-    ROW3 = Group(VVAVE3)
-    ROW4 = Group(VVAVE4)
-    gamePlaying = True
+    ROVV1 = Group(VVAVE1, STARTBUTTON)
+    ROVV2 = Group(VVAVE2)
+    ROVV3 = Group(VVAVE3)
+    ROVV4 = Group(VVAVE4)
+    gamePlaying = False
+    newDolphinNeeded = False
+
+    drawBoard()
 
     while True:
 
@@ -72,8 +88,15 @@ def main():
                 buttonPressed = True
                 mousex, mousey = event.pos
 
-        if buttonPressed and mousex == mousey:
-            print("filler")
+        if not gamePlaying and buttonPressed:
+            if STARTBUTTON.rect.collidepoint:(mousex, mousey):
+                ROVV1.remove(STARTBUTTON)
+                gamePlaying = True
+                newDolphinNeeded = True
+                FPSCLOCK. = 0
+        elif gamePlaying and buttonPressed and abs(mousex - 300) < 201 and abs(mousey - 300) < 201:
+
+
 
 
 def drawBoard():
@@ -81,16 +104,16 @@ def drawBoard():
     drawClock()
     pygame.draw.rect(DISPLAYSURF, VVHITE, (100, 100, 400, 400))
 
-    ROW1.draw(DISPLAYSURF)
+    ROVV1.draw(DISPLAYSURF)
     pygame.draw.rect(DISPLAYSURF, VVHITE, (100, 200, 400, 300))
 
-    ROW2.draw(DISPLAYSURF)
+    ROVV2.draw(DISPLAYSURF)
     pygame.draw.rect(DISPLAYSURF, VVHITE, (100, 300, 400, 200))
 
-    ROW3.draw(DISPLAYSURF)
+    ROVV3.draw(DISPLAYSURF)
     pygame.draw.rect(DISPLAYSURF, VVHITE, (100, 400, 400, 100))
 
-    ROW4.draw(DISPLAYSURF)
+    ROVV4.draw(DISPLAYSURF)
     pygame.draw.rect(DISPLAYSURF, BLACK, (100, 500, 400, 100))
     pygame.display.update()
 
