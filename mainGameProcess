@@ -31,7 +31,7 @@ class PlayButton(pygame.sprite.Sprite):
         self.image = textFont.render(message,True, textColor, bgColor)
 
         self.rect = self.image.get_rect()
-        self.rect.centerx, self.rect.y = x, centery
+        self.rect.centerx, self.rect.centery = x, y
 
 
 VVINDOVVSIZE = 600
@@ -46,7 +46,7 @@ BLUEMANGROUP = (33, 195, 200)
 
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, GAMEFONT, ROVV1, ROVV2, ROVV3, ROVV4
+    global FPSCLOCK, DISPLAYSURF, GAMEFONT, ROVV1, ROVV2, ROVV3, ROVV4, STARTGROUP, SUBTIME
     pygame.init()
     DISPLAYSURF = pygame.display.set_mode((VVINDOVVSIZE, VVINDOVVSIZE))
     FPSCLOCK = pygame.time.Clock()
@@ -56,26 +56,52 @@ def main():
     VVAVE2 = VVaveRow(100, 225)
     VVAVE3 = VVaveRow(100, 325)
     VVAVE4 = VVaveRow(100, 425)
-    STARTBUTTON = PlayButton(300, 50, GAMEFONT, "Play VVhackamole", BLUEMANGROUP, VVHITE)
+    STARTBUTTON = PlayButton(300, 550, GAMEFONT, "Play VVhackamole", BLUEMANGROUP, VVHITE)
     pygame.mixer_music.load("yodaDeath.mp3")
 
     mousex = 0
     mousey = 0
     timeGame = 0
-    ROVV1 = Group(VVAVE1, STARTBUTTON)
+    score = 0
+    dolPos = 0
+
+    ROVV1 = Group(VVAVE1)
     ROVV2 = Group(VVAVE2)
     ROVV3 = Group(VVAVE3)
     ROVV4 = Group(VVAVE4)
+    STARTGROUP = Group(STARTBUTTON)
     gamePlaying = False
+    dolphinUp = False
     newDolphinNeeded = False
 
-    drawBoard()
+    SUBTIME = 0
+
+    drawBoard(0)
 
     while True:
 
         if gamePlaying:
-            drawBoard()
-            timeGame =  int(pygame.time.get_ticks() / 1000)
+            drawBoard(score)
+            timeGame =  int((pygame.time.get_ticks() - SUBTIME) / 1000)
+        else:
+            SUBTIME = pygame.time.get_ticks()
+
+
+        if newDolphinNeeded:
+            dolPos = random.randint(1, 4)
+            DOLPHINSPRITE.rect.y = 100 * dolPos
+            DOLPHINSPRITE.rect.x = random.randint(100, 400)
+            newDolphinNeeded = False
+            print(dolPos)
+            if dolPos == 1:
+                ROVV1.add(DOLPHINSPRITE)
+            elif dolPos == 2:
+                ROVV2.add(DOLPHINSPRITE)
+            elif dolPos == 3:
+                ROVV3.add(DOLPHINSPRITE)
+            elif dolPos == 4:
+                ROVV4.add(DOLPHINSPRITE)
+
 
         buttonPressed = False
         for event in pygame.event.get():
@@ -89,19 +115,22 @@ def main():
                 mousex, mousey = event.pos
 
         if not gamePlaying and buttonPressed:
-            if STARTBUTTON.rect.collidepoint:(mousex, mousey):
-                ROVV1.remove(STARTBUTTON)
+            if STARTBUTTON.rect.collidepoint(mousex, mousey):
+                STARTGROUP.remove(STARTBUTTON)
                 gamePlaying = True
                 newDolphinNeeded = True
-                FPSCLOCK. = 0
         elif gamePlaying and buttonPressed and abs(mousex - 300) < 201 and abs(mousey - 300) < 201:
+            if DOLPHINSPRITE.rect.collidepoint(mousex, mousey) and dolphinUp:
+                dolphinUp = False
+                score += 1
 
 
 
-
-def drawBoard():
+def drawBoard(score):
     DISPLAYSURF.fill(BLACK)
     drawClock()
+    SCORE = GAMEFONT.render(str(score), True, PURPBOI)
+    DISPLAYSURF.blit(SCORE, (400, 10))
     pygame.draw.rect(DISPLAYSURF, VVHITE, (100, 100, 400, 400))
 
     ROVV1.draw(DISPLAYSURF)
@@ -115,12 +144,13 @@ def drawBoard():
 
     ROVV4.draw(DISPLAYSURF)
     pygame.draw.rect(DISPLAYSURF, BLACK, (100, 500, 400, 100))
+    STARTGROUP.draw(DISPLAYSURF)
     pygame.display.update()
 
 
 def drawClock():
     FPSCLOCK.tick(FPS)
-    timeNum = int(pygame.time.get_ticks() / 1000)
+    timeNum = int((pygame.time.get_ticks() - SUBTIME) / 1000)
     timeStr = str(int(timeNum % 60))
     timeNum = timeNum - (timeNum % 60)
     minnum = 0
@@ -130,7 +160,7 @@ def drawClock():
     if len(timeStr) == 1:
         timeStr = "0" + timeStr
     timeStr = str(minnum) + ":" + timeStr
-    timer = GAMEFONT.render(timeStr, True, VVHITE)
+    timer = GAMEFONT.render(timeStr, True, BLUEMANGROUP)
     DISPLAYSURF.blit(timer, (10, 10))
 
 
