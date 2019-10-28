@@ -49,6 +49,7 @@ def main():
     global FPSCLOCK, DISPLAYSURF, GAMEFONT, ROVV1, ROVV2, ROVV3, ROVV4, STARTGROUP, SUBTIME
     pygame.init()
     DISPLAYSURF = pygame.display.set_mode((VVINDOVVSIZE, VVINDOVVSIZE))
+    pygame.display.set_caption("VVhack-a-dolphin")
     FPSCLOCK = pygame.time.Clock()
     GAMEFONT = pygame.font.Font('./3Dventure.ttf', FONTSIZE)
     DOLPHINSPRITE = DolphinHead()
@@ -57,13 +58,14 @@ def main():
     VVAVE3 = VVaveRow(100, 325)
     VVAVE4 = VVaveRow(100, 425)
     STARTBUTTON = PlayButton(300, 550, GAMEFONT, "Play VVhackamole", BLUEMANGROUP, VVHITE)
-    pygame.mixer_music.load("yodaDeath.mp3")
+    LEGOYODA = pygame.mixer.Sound("yodaDeathOG.wav")
 
     mousex = 0
     mousey = 0
     timeGame = 0
     score = 0
     dolPos = 0
+    waitTime = 0
 
     ROVV1 = Group(VVAVE1)
     ROVV2 = Group(VVAVE2)
@@ -79,50 +81,51 @@ def main():
 
     SUBTIME = 0
 
-    drawBoard(0)
+    drawBoard(0, True)
 
     while True:
 
         if timeGame > 180:
             gamePlaying = False
-            pygame.time.wait(10000)
+            pygame.time.wait(1000)
             main()
 
         if gamePlaying:
-            drawBoard(score)
+            drawBoard(score, False)
             timeGame =  int((pygame.time.get_ticks() - SUBTIME) / 1000)
         else:
             SUBTIME = pygame.time.get_ticks()
 
 
         if newDolphinNeeded:
-            dolPos = random.randint(1, 4)
-            DOLPHINSPRITE.rect.y = (100 * dolPos) + 88
-            DOLPHINSPRITE.rect.x = random.randint(100, 400)
-            newDolphinNeeded = False
-            dolphinOut = True
-            dolphinUp = True
-            print(dolPos)
-            if dolPos == 1:
-                ROVV1.add(DOLPHINSPRITE)
-            elif dolPos == 2:
-                ROVV2.add(DOLPHINSPRITE)
-            elif dolPos == 3:
-                ROVV3.add(DOLPHINSPRITE)
-            elif dolPos == 4:
-                ROVV4.add(DOLPHINSPRITE)
+                dolPos = random.randint(0, 3)
+                DOLPHINSPRITE.rect.y = (100 * dolPos) + 88
+                DOLPHINSPRITE.rect.x = random.randint(100, 400)
+                newDolphinNeeded = False
+                dolphinOut = True
+                dolphinUp = True
+                print(dolPos)
+                if dolPos == 0:
+                    ROVV1.add(DOLPHINSPRITE)
+                elif dolPos == 1:
+                    ROVV2.add(DOLPHINSPRITE)
+                elif dolPos == 2:
+                    ROVV3.add(DOLPHINSPRITE)
+                elif dolPos == 3:
+                    ROVV4.add(DOLPHINSPRITE)
+
 
 
         if dolphinUp:
             if DOLPHINSPRITE.rect.y > ((dolPos * 100)):
-                DOLPHINSPRITE.rect.y -= 1
+                DOLPHINSPRITE.rect.y -= 1 + (score + 1) / 11
             else:
                 dolphinUp = False
                 dolphinDown = True
 
         if dolphinDown:
             if DOLPHINSPRITE.rect.y < ((dolPos * 100) + 88):
-                DOLPHINSPRITE.rect.y += 1
+                DOLPHINSPRITE.rect.y += 1 + (score + 1) / 11
             else:
                 dolphinDown = False
                 dolphinOut = False
@@ -130,8 +133,8 @@ def main():
 
         if dolphinQuickDown:
             dolphinOut = False
-            if DOLPHINSPRITE.rect.y > ((dolPos * 100) + 88):
-                DOLPHINSPRITE.rect.y += 2
+            if DOLPHINSPRITE.rect.y < ((dolPos * 100) + 88):
+                DOLPHINSPRITE.rect.y += 2  * (1 + (score + 1) / 11 )
             else:
                 dolphinQuickDown = False
                 newDolphinNeeded = True
@@ -160,12 +163,14 @@ def main():
                 dolphinUp = False
                 dolphinDown = False
                 score += 1
+                LEGOYODA.play(1)
+                pygame.time.wait(int(LEGOYODA.get_length() * 1000))
 
 
 
-def drawBoard(score):
+def drawBoard(score, new):
     DISPLAYSURF.fill(BLACK)
-    drawClock()
+    drawClock(new)
     SCORE = GAMEFONT.render(str(score), True, PURPBOI)
     DISPLAYSURF.blit(SCORE, (400, 10))
     pygame.draw.rect(DISPLAYSURF, VVHITE, (100, 100, 400, 400))
@@ -185,7 +190,7 @@ def drawBoard(score):
     pygame.display.update()
 
 
-def drawClock():
+def drawClock(new):
     FPSCLOCK.tick(FPS)
     timeNum = int((pygame.time.get_ticks() - SUBTIME) / 1000)
     timeStr = str(int(timeNum % 60))
@@ -197,6 +202,8 @@ def drawClock():
     if len(timeStr) == 1:
         timeStr = "0" + timeStr
     timeStr = str(minnum) + ":" + timeStr
+    if new:
+        timeStr = "0:00"
     timer = GAMEFONT.render(timeStr, True, BLUEMANGROUP)
     DISPLAYSURF.blit(timer, (10, 10))
 
