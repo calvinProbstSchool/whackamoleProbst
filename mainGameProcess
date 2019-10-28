@@ -35,7 +35,7 @@ class PlayButton(pygame.sprite.Sprite):
 
 
 VVINDOVVSIZE = 600
-FPS = 30
+FPS = 300
 FONTSIZE = 60
 
 VVHITE = (255, 255, 255)
@@ -72,6 +72,9 @@ def main():
     STARTGROUP = Group(STARTBUTTON)
     gamePlaying = False
     dolphinUp = False
+    dolphinDown = False
+    dolphinOut = False
+    dolphinQuickDown = False
     newDolphinNeeded = False
 
     SUBTIME = 0
@@ -79,6 +82,11 @@ def main():
     drawBoard(0)
 
     while True:
+
+        if timeGame > 180:
+            gamePlaying = False
+            pygame.time.wait(10000)
+            main()
 
         if gamePlaying:
             drawBoard(score)
@@ -89,9 +97,11 @@ def main():
 
         if newDolphinNeeded:
             dolPos = random.randint(1, 4)
-            DOLPHINSPRITE.rect.y = 100 * dolPos
+            DOLPHINSPRITE.rect.y = (100 * dolPos) + 88
             DOLPHINSPRITE.rect.x = random.randint(100, 400)
             newDolphinNeeded = False
+            dolphinOut = True
+            dolphinUp = True
             print(dolPos)
             if dolPos == 1:
                 ROVV1.add(DOLPHINSPRITE)
@@ -101,6 +111,30 @@ def main():
                 ROVV3.add(DOLPHINSPRITE)
             elif dolPos == 4:
                 ROVV4.add(DOLPHINSPRITE)
+
+
+        if dolphinUp:
+            if DOLPHINSPRITE.rect.y > ((dolPos * 100)):
+                DOLPHINSPRITE.rect.y -= 1
+            else:
+                dolphinUp = False
+                dolphinDown = True
+
+        if dolphinDown:
+            if DOLPHINSPRITE.rect.y < ((dolPos * 100) + 88):
+                DOLPHINSPRITE.rect.y += 1
+            else:
+                dolphinDown = False
+                dolphinOut = False
+                newDolphinNeeded = True
+
+        if dolphinQuickDown:
+            dolphinOut = False
+            if DOLPHINSPRITE.rect.y > ((dolPos * 100) + 88):
+                DOLPHINSPRITE.rect.y += 2
+            else:
+                dolphinQuickDown = False
+                newDolphinNeeded = True
 
 
         buttonPressed = False
@@ -120,8 +154,11 @@ def main():
                 gamePlaying = True
                 newDolphinNeeded = True
         elif gamePlaying and buttonPressed and abs(mousex - 300) < 201 and abs(mousey - 300) < 201:
-            if DOLPHINSPRITE.rect.collidepoint(mousex, mousey) and dolphinUp:
+            if DOLPHINSPRITE.rect.collidepoint(mousex, mousey) and dolphinOut:
+                dolphinOut = False
+                dolphinQuickDown = True
                 dolphinUp = False
+                dolphinDown = False
                 score += 1
 
 
