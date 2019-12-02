@@ -208,5 +208,4 @@ def drawClock(new):
     DISPLAYSURF.blit(timer, (10, 10))
 
 
-
 main()
